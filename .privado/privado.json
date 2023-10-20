@@ -1,0 +1,447 @@
+{
+  "privadoCoreVersion" : "1.1.95",
+  "privadoCLIVersion" : "v2.2.5",
+  "privadoMainVersion" : "1.3.37\n",
+  "privadoLanguageEngineVersion" : "2.0.117",
+  "createdAt" : 1697535678023,
+  "repoName" : "java_demo",
+  "language" : "java",
+  "gitMetadata" : {
+    
+  },
+  "localScanPath" : "/Users/ankit-privado/Desktop/privado/hackathon/java_demo",
+  "probableSinks" : [
+  ],
+  "collections" : [
+  ],
+  "sources" : [
+    {
+      "sourceType" : "Data Element",
+      "id" : "Data.Sensitive.PersonalIdentification.FirstName",
+      "name" : "First Name",
+      "category" : "Personal Identification",
+      "sensitivity" : "low",
+      "isSensitive" : false,
+      "tags" : {
+        "law" : "GDPR"
+      }
+    },
+    {
+      "sourceType" : "Data Element",
+      "id" : "Data.Sensitive.PersonalIdentification.LastName",
+      "name" : "Last Name",
+      "category" : "Personal Identification",
+      "sensitivity" : "low",
+      "isSensitive" : false,
+      "tags" : {
+        "law" : "GDPR"
+      }
+    }
+  ],
+  "sinks" : [
+    {
+      "sourceType" : "Sinks",
+      "sinkType" : "third_parties",
+      "id" : "ThirdParties.SDK.Amazon.Aws",
+      "name" : "Amazon Aws",
+      "domains" : [
+        "aws.amazon.com"
+      ],
+      "apiUrl" : [
+      ],
+      "databaseDetails" : {
+        "dbName" : "",
+        "dbVendor" : "",
+        "dbLocation" : "",
+        "dbOperation" : "",
+        "configFile" : "",
+        "schema" : null
+      }
+    },
+    {
+      "sourceType" : "Sinks",
+      "sinkType" : "storages",
+      "id" : "Storages.AmazonS3.Write",
+      "name" : "Amazon S3(Write)",
+      "domains" : [
+        "aws.amazon.com"
+      ],
+      "apiUrl" : [
+      ],
+      "databaseDetails" : {
+        "dbName" : "",
+        "dbVendor" : "",
+        "dbLocation" : "",
+        "dbOperation" : "",
+        "configFile" : "",
+        "schema" : null
+      }
+    }
+  ],
+  "sinkProcessing" : [
+    {
+      "sinkId" : "Storages.AmazonS3.Write",
+      "occurrences" : [
+        {
+          "sample" : "builder()",
+          "lineNumber" : 12,
+          "columnNumber" : 36,
+          "fileName" : "AWS.java",
+          "excerpt" : "        S3Client s3Client = S3Client.builder().build();\n        String firstName = \"name\";\n        String objectKey = \"your-object-key\";\n        String filePath = \"path/to/your/file.txt\";\n\n        PutObjectRequest request = PutObjectRequest.builder() /* <=== software.amazon.awssdk.services.s3.model.PutObjectRequest.builder */ \n            .bucket(firstName)\n            .key(objectKey)\n            .build();\n\n        s3Client.putObject(request, RequestBody.fromFile(new File(filePath));"
+        }
+      ]
+    },
+    {
+      "sinkId" : "ThirdParties.SDK.Amazon.Aws",
+      "occurrences" : [
+        {
+          "sample" : "builder()",
+          "lineNumber" : 7,
+          "columnNumber" : 29,
+          "fileName" : "AWS.java",
+          "excerpt" : "import software.amazon.awssdk.services.s3.S3Client;\nimport software.amazon.awssdk.services.s3.model.PutObjectRequest;\n\npublic class AWS {\n    public static void main(String[] args) {\n        S3Client s3Client = S3Client.builder().build(); /* <=== software.amazon.awssdk.services.s3.S3Client.builder */ \n        String firstName = \"name\";\n        String objectKey = \"your-object-key\";\n        String filePath = \"path/to/your/file.txt\";\n\n        PutObjectRequest request = PutObjectRequest.builder()"
+        }
+      ]
+    }
+  ],
+  "processing" : [
+    {
+      "sourceId" : "Data.Sensitive.PersonalIdentification.FirstName",
+      "occurrences" : [
+        {
+          "sample" : "firstname",
+          "lineNumber" : 6,
+          "columnNumber" : 28,
+          "fileName" : "Main.java",
+          "excerpt" : "public class Main {\n    public static void main(String[] args) {\n        String firstname = \"data\";\n        String lastName = \"value\";\n\n        System.out.println(firstname); /* <=== java.lang.String */ \n\n        String fullName = calculate(firstname);\n\n        System.out.println(fullName);\n    }"
+        },
+        {
+          "sample" : "firstName",
+          "lineNumber" : 8,
+          "columnNumber" : 16,
+          "fileName" : "AWS.java",
+          "excerpt" : "import software.amazon.awssdk.services.s3.model.PutObjectRequest;\n\npublic class AWS {\n    public static void main(String[] args) {\n        S3Client s3Client = S3Client.builder().build();\n        String firstName = \"name\"; /* <=== java.lang.String */ \n        String objectKey = \"your-object-key\";\n        String filePath = \"path/to/your/file.txt\";\n\n        PutObjectRequest request = PutObjectRequest.builder()\n            .bucket(firstName)"
+        }
+      ]
+    },
+    {
+      "sourceId" : "Data.Sensitive.PersonalIdentification.LastName",
+      "occurrences" : [
+        {
+          "sample" : "lastName",
+          "lineNumber" : 4,
+          "columnNumber" : 16,
+          "fileName" : "Main.java",
+          "excerpt" : "public class Main {\n    public static void main(String[] args) {\n        String firstname = \"data\";\n        String lastName = \"value\"; /* <=== java.lang.String */ \n\n        System.out.println(firstname);\n\n        String fullName = calculate(firstname);\n"
+        }
+      ]
+    }
+  ],
+  "violations" : [
+    {
+      "policyId" : "Threats.Leakage.isDataLeakingToLog",
+      "policyDetails" : {
+        "name" : "PII data is written to the log files",
+        "policyType" : "threat",
+        "description" : "Sensitive Data written to log files or file system may lead to unauthorized access or exposure to potential attack.",
+        "fix" : "It is not recommended to log Sensitive Data to log files or the file system. The data must be encrypted if it is absolutely necessary to log it.",
+        "action" : "",
+        "tags" : {
+          "CWE-359" : "https://cwe.mitre.org/data/definitions/359.html",
+          "CWE-532" : "https://cwe.mitre.org/data/definitions/532.html",
+          "MSTG-STORAGE-3" : "https://github.com/OWASP/owasp-mstg/blob/master/Document/0x05d-Testing-Data-Storage.md#Testing-Logs-for-Sensitive-Data-MSTG-STORAGE-3",
+          "MITRE" : "Sharing.Exposure"
+        }
+      },
+      "dataFlow" : [
+        {
+          "sourceId" : "Data.Sensitive.PersonalIdentification.FirstName",
+          "sinkId" : "Leakages.Log.Console",
+          "pathIds" : [
+            "83-93-98-108-113-112-117-116-120-97-96-103-99",
+            "83-93-89"
+          ]
+        }
+      ],
+      "processing" : null
+    }
+  ],
+  "dataFlow" : {
+    "storages" : [
+      {
+        "sourceId" : "Data.Sensitive.PersonalIdentification.FirstName",
+        "sinks" : [
+          {
+            "sinkType" : "storages",
+            "id" : "Storages.AmazonS3.Write",
+            "name" : "Amazon S3(Write)",
+            "category" : "",
+            "domains" : [
+              "aws.amazon.com"
+            ],
+            "sensitivity" : "",
+            "isSensitive" : false,
+            "tags" : {
+              
+            },
+            "apiUrl" : [
+            ],
+            "databaseDetails" : {
+              "dbName" : "",
+              "dbVendor" : "",
+              "dbLocation" : "",
+              "dbOperation" : "",
+              "configFile" : "",
+              "schema" : null
+            },
+            "paths" : [
+              {
+                "pathId" : "28-46-44",
+                "path" : [
+                  {
+                    "sample" : "firstName",
+                    "lineNumber" : 8,
+                    "columnNumber" : 16,
+                    "fileName" : "AWS.java",
+                    "excerpt" : "import software.amazon.awssdk.services.s3.model.PutObjectRequest;\n\npublic class AWS {\n    public static void main(String[] args) {\n        S3Client s3Client = S3Client.builder().build();\n        String firstName = \"name\"; /* <=== java.lang.String */ \n        String objectKey = \"your-object-key\";\n        String filePath = \"path/to/your/file.txt\";\n\n        PutObjectRequest request = PutObjectRequest.builder()\n            .bucket(firstName)"
+                  },
+                  {
+                    "sample" : "firstName",
+                    "lineNumber" : 13,
+                    "columnNumber" : 21,
+                    "fileName" : "AWS.java",
+                    "excerpt" : "        String firstName = \"name\";\n        String objectKey = \"your-object-key\";\n        String filePath = \"path/to/your/file.txt\";\n\n        PutObjectRequest request = PutObjectRequest.builder()\n            .bucket(firstName) /* <=== java.lang.String */ \n            .key(objectKey)\n            .build();\n\n        s3Client.putObject(request, RequestBody.fromFile(new File(filePath));\n        s3Client.close();"
+                  },
+                  {
+                    "sample" : "builder()",
+                    "lineNumber" : 12,
+                    "columnNumber" : 36,
+                    "fileName" : "AWS.java",
+                    "excerpt" : "        S3Client s3Client = S3Client.builder().build();\n        String firstName = \"name\";\n        String objectKey = \"your-object-key\";\n        String filePath = \"path/to/your/file.txt\";\n\n        PutObjectRequest request = PutObjectRequest.builder() /* <=== software.amazon.awssdk.services.s3.model.PutObjectRequest.builder */ \n            .bucket(firstName)\n            .key(objectKey)\n            .build();\n\n        s3Client.putObject(request, RequestBody.fromFile(new File(filePath));"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "miscellaneous" : [
+    ],
+    "internal_apis" : [
+    ],
+    "leakages" : [
+      {
+        "sourceId" : "Data.Sensitive.PersonalIdentification.FirstName",
+        "sinks" : [
+          {
+            "sinkType" : "leakages",
+            "id" : "Leakages.Log.Console",
+            "name" : "Log Console",
+            "category" : "",
+            "domains" : [
+            ],
+            "sensitivity" : "",
+            "isSensitive" : false,
+            "tags" : {
+              
+            },
+            "apiUrl" : [
+            ],
+            "databaseDetails" : {
+              "dbName" : "",
+              "dbVendor" : "",
+              "dbLocation" : "",
+              "dbOperation" : "",
+              "configFile" : "",
+              "schema" : null
+            },
+            "paths" : [
+              {
+                "pathId" : "83-93-98-108-113-112-117-116-120-97-96-103-99",
+                "path" : [
+                  {
+                    "sample" : "firstname",
+                    "lineNumber" : 3,
+                    "columnNumber" : 16,
+                    "fileName" : "Main.java",
+                    "excerpt" : "public class Main {\n    public static void main(String[] args) {\n        String firstname = \"data\"; /* <=== java.lang.String */ \n        String lastName = \"value\";\n\n        System.out.println(firstname);\n\n        String fullName = calculate(firstname);"
+                  },
+                  {
+                    "sample" : "firstname",
+                    "lineNumber" : 6,
+                    "columnNumber" : 28,
+                    "fileName" : "Main.java",
+                    "excerpt" : "public class Main {\n    public static void main(String[] args) {\n        String firstname = \"data\";\n        String lastName = \"value\";\n\n        System.out.println(firstname); /* <=== java.lang.String */ \n\n        String fullName = calculate(firstname);\n\n        System.out.println(fullName);\n    }"
+                  },
+                  {
+                    "sample" : "firstname",
+                    "lineNumber" : 8,
+                    "columnNumber" : 37,
+                    "fileName" : "Main.java",
+                    "excerpt" : "        String firstname = \"data\";\n        String lastName = \"value\";\n\n        System.out.println(firstname);\n\n        String fullName = calculate(firstname); /* <=== java.lang.String */ \n\n        System.out.println(fullName);\n    }\n\n    public static String calculate(String name) {"
+                  },
+                  {
+                    "sample" : "String name",
+                    "lineNumber" : 13,
+                    "columnNumber" : 36,
+                    "fileName" : "Main.java",
+                    "excerpt" : "        String fullName = calculate(firstname);\n\n        System.out.println(fullName);\n    }\n\n    public static String calculate(String name) { /* <===  */ \n        String temp = name + \".\";\n        return temp;\n    }\n}"
+                  },
+                  {
+                    "sample" : "name + \".\"",
+                    "lineNumber" : 14,
+                    "columnNumber" : 23,
+                    "fileName" : "Main.java",
+                    "excerpt" : "\n        System.out.println(fullName);\n    }\n\n    public static String calculate(String name) {\n        String temp = name + \".\"; /* <===  */ \n        return temp;\n    }\n}"
+                  },
+                  {
+                    "sample" : "temp",
+                    "lineNumber" : 14,
+                    "columnNumber" : 16,
+                    "fileName" : "Main.java",
+                    "excerpt" : "\n        System.out.println(fullName);\n    }\n\n    public static String calculate(String name) {\n        String temp = name + \".\"; /* <=== java.lang.String */ \n        return temp;\n    }\n}"
+                  },
+                  {
+                    "sample" : "temp",
+                    "lineNumber" : 15,
+                    "columnNumber" : 16,
+                    "fileName" : "Main.java",
+                    "excerpt" : "        System.out.println(fullName);\n    }\n\n    public static String calculate(String name) {\n        String temp = name + \".\";\n        return temp; /* <=== java.lang.String */ \n    }\n}"
+                  },
+                  {
+                    "sample" : "return temp;",
+                    "lineNumber" : 15,
+                    "columnNumber" : 9,
+                    "fileName" : "Main.java",
+                    "excerpt" : "        System.out.println(fullName);\n    }\n\n    public static String calculate(String name) {\n        String temp = name + \".\";\n        return temp; /* <===  */ \n    }\n}"
+                  },
+                  {
+                    "sample" : "RET",
+                    "lineNumber" : 13,
+                    "columnNumber" : 19,
+                    "fileName" : "Main.java",
+                    "excerpt" : "        String fullName = calculate(firstname);\n\n        System.out.println(fullName);\n    }\n\n    public static String calculate(String name) { /* <===  */ \n        String temp = name + \".\";\n        return temp;\n    }\n}"
+                  },
+                  {
+                    "sample" : "calculate(firstname)",
+                    "lineNumber" : 8,
+                    "columnNumber" : 27,
+                    "fileName" : "Main.java",
+                    "excerpt" : "        String firstname = \"data\";\n        String lastName = \"value\";\n\n        System.out.println(firstname);\n\n        String fullName = calculate(firstname); /* <=== Main.calculate */ \n\n        System.out.println(fullName);\n    }\n\n    public static String calculate(String name) {"
+                  },
+                  {
+                    "sample" : "fullName",
+                    "lineNumber" : 8,
+                    "columnNumber" : 16,
+                    "fileName" : "Main.java",
+                    "excerpt" : "        String firstname = \"data\";\n        String lastName = \"value\";\n\n        System.out.println(firstname);\n\n        String fullName = calculate(firstname); /* <=== java.lang.String */ \n\n        System.out.println(fullName);\n    }\n\n    public static String calculate(String name) {"
+                  },
+                  {
+                    "sample" : "fullName",
+                    "lineNumber" : 10,
+                    "columnNumber" : 28,
+                    "fileName" : "Main.java",
+                    "excerpt" : "\n        System.out.println(firstname);\n\n        String fullName = calculate(firstname);\n\n        System.out.println(fullName); /* <=== java.lang.String */ \n    }\n\n    public static String calculate(String name) {\n        String temp = name + \".\";\n        return temp;"
+                  },
+                  {
+                    "sample" : "System.out.println(fullName)",
+                    "lineNumber" : 10,
+                    "columnNumber" : 9,
+                    "fileName" : "Main.java",
+                    "excerpt" : "\n        System.out.println(firstname);\n\n        String fullName = calculate(firstname);\n\n        System.out.println(fullName); /* <=== java.io.PrintStream.println */ \n    }\n\n    public static String calculate(String name) {\n        String temp = name + \".\";\n        return temp;"
+                  }
+                ]
+              },
+              {
+                "pathId" : "83-93-89",
+                "path" : [
+                  {
+                    "sample" : "firstname",
+                    "lineNumber" : 3,
+                    "columnNumber" : 16,
+                    "fileName" : "Main.java",
+                    "excerpt" : "public class Main {\n    public static void main(String[] args) {\n        String firstname = \"data\"; /* <=== java.lang.String */ \n        String lastName = \"value\";\n\n        System.out.println(firstname);\n\n        String fullName = calculate(firstname);"
+                  },
+                  {
+                    "sample" : "firstname",
+                    "lineNumber" : 6,
+                    "columnNumber" : 28,
+                    "fileName" : "Main.java",
+                    "excerpt" : "public class Main {\n    public static void main(String[] args) {\n        String firstname = \"data\";\n        String lastName = \"value\";\n\n        System.out.println(firstname); /* <=== java.lang.String */ \n\n        String fullName = calculate(firstname);\n\n        System.out.println(fullName);\n    }"
+                  },
+                  {
+                    "sample" : "System.out.println(firstname)",
+                    "lineNumber" : 6,
+                    "columnNumber" : 9,
+                    "fileName" : "Main.java",
+                    "excerpt" : "public class Main {\n    public static void main(String[] args) {\n        String firstname = \"data\";\n        String lastName = \"value\";\n\n        System.out.println(firstname); /* <=== java.io.PrintStream.println */ \n\n        String fullName = calculate(firstname);\n\n        System.out.println(fullName);\n    }"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "third_parties" : [
+      {
+        "sourceId" : "Data.Sensitive.PersonalIdentification.FirstName",
+        "sinks" : [
+          {
+            "sinkType" : "third_parties",
+            "id" : "ThirdParties.SDK.Amazon.Aws",
+            "name" : "Amazon Aws",
+            "category" : "",
+            "domains" : [
+              "aws.amazon.com"
+            ],
+            "sensitivity" : "",
+            "isSensitive" : false,
+            "tags" : {
+              
+            },
+            "apiUrl" : [
+            ],
+            "databaseDetails" : {
+              "dbName" : "",
+              "dbVendor" : "",
+              "dbLocation" : "",
+              "dbOperation" : "",
+              "configFile" : "",
+              "schema" : null
+            },
+            "paths" : [
+              {
+                "pathId" : "28-46-44",
+                "path" : [
+                  {
+                    "sample" : "firstName",
+                    "lineNumber" : 8,
+                    "columnNumber" : 16,
+                    "fileName" : "AWS.java",
+                    "excerpt" : "import software.amazon.awssdk.services.s3.model.PutObjectRequest;\n\npublic class AWS {\n    public static void main(String[] args) {\n        S3Client s3Client = S3Client.builder().build();\n        String firstName = \"name\"; /* <=== java.lang.String */ \n        String objectKey = \"your-object-key\";\n        String filePath = \"path/to/your/file.txt\";\n\n        PutObjectRequest request = PutObjectRequest.builder()\n            .bucket(firstName)"
+                  },
+                  {
+                    "sample" : "firstName",
+                    "lineNumber" : 13,
+                    "columnNumber" : 21,
+                    "fileName" : "AWS.java",
+                    "excerpt" : "        String firstName = \"name\";\n        String objectKey = \"your-object-key\";\n        String filePath = \"path/to/your/file.txt\";\n\n        PutObjectRequest request = PutObjectRequest.builder()\n            .bucket(firstName) /* <=== java.lang.String */ \n            .key(objectKey)\n            .build();\n\n        s3Client.putObject(request, RequestBody.fromFile(new File(filePath));\n        s3Client.close();"
+                  },
+                  {
+                    "sample" : "builder()",
+                    "lineNumber" : 12,
+                    "columnNumber" : 36,
+                    "fileName" : "AWS.java",
+                    "excerpt" : "        S3Client s3Client = S3Client.builder().build();\n        String firstName = \"name\";\n        String objectKey = \"your-object-key\";\n        String filePath = \"path/to/your/file.txt\";\n\n        PutObjectRequest request = PutObjectRequest.builder() /* <=== software.amazon.awssdk.services.s3.model.PutObjectRequest.builder */ \n            .bucket(firstName)\n            .key(objectKey)\n            .build();\n\n        s3Client.putObject(request, RequestBody.fromFile(new File(filePath));"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
